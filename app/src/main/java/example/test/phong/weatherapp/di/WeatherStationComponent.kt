@@ -15,13 +15,15 @@ import javax.inject.Singleton
     AndroidBuilder::class,
     WeatherStationModule::class,
     LocationModule::class,
-    WeatherModule::class
+    WeatherModule::class,
+    ViewModelModule::class
 ])
 interface WeatherStationComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance
         fun application(app: Application): Builder
+
         fun build(): WeatherStationComponent
     }
 

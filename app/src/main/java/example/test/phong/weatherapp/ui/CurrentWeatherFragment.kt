@@ -10,6 +10,9 @@ import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import dagger.android.support.AndroidSupportInjection
 import example.test.phong.weatherapp.BuildConfig
 import example.test.phong.weatherapp.Converter
@@ -34,17 +37,20 @@ import javax.inject.Inject
  *
  */
 class CurrentWeatherFragment : Fragment() {
-    @Inject
-    lateinit var locationProvider: LocationProvider
-    @Inject lateinit var currentWeatherProvider: CurrentWeatherProvider
-
+    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    private lateinit var currentWeatherViewModel: CurrentWeatherViewModel
     private lateinit var converter: Converter
-
-    private var call: Call<Current>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
+        currentWeatherViewModel = ViewModelProviders.of(this, viewModelFactory)
+                .get(CurrentWeatherViewModel::class.java)
+                .apply {
+                    currentWeather.observe(this@CurrentWeatherFragment, Observer<CurrentWeather> {
+                        bind(it)
+                    })
+                }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -86,21 +92,8 @@ class CurrentWeatherFragment : Fragment() {
                     setDisplayHomeAsUpEnabled(false)
                 }
             }
-            locationProvider.requestUpdates(::retrieveForecast)
         }
     }
-
-    override fun onPause() {
-        call?.cancel()
-        locationProvider.cancelUpdates(::retrieveForecast)
-        super.onPause()
-    }
-
-    private fun retrieveForecast(latitude: @ParameterName(name = "latitude") Double, longitude: @ParameterName(name = "longitude") Double) {
-        currentWeatherProvider.request(latitude, longitude, ::bind)
-    }
-
-    private var currentWeather: Current? = null
 
     private fun bind(current: CurrentWeather) {
         androidx.transition.TransitionManager.beginDelayedTransition(content_panel)
