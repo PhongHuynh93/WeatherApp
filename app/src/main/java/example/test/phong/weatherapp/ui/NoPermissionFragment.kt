@@ -1,10 +1,12 @@
 package example.test.phong.weatherapp.ui
 
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import example.test.phong.weatherapp.R
 
@@ -25,5 +27,12 @@ class NoPermissionFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_no_permission, container, false)
     }
 
-
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is AppCompatActivity) {
+            context.supportActionBar?.apply {
+                setTitle(R.string.app_name)
+            }
+        }
+    }
 }

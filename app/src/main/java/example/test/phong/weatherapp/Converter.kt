@@ -29,6 +29,7 @@ class Converter(
                 context.getString(template, newValue)
             }
 
+
     private fun kelvinToCelsius(value: Float): Float {
         return value - 273.15f
     }
