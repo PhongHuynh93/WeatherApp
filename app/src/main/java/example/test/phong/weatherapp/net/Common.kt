@@ -1,10 +1,10 @@
-package example.test.phong.weatherapp.model
+package example.test.phong.weatherapp.net
 
 import com.squareup.moshi.Json
 
 data class Coordinates(
-        @Json(name = "lat") val latitue: Float,
-        @Json(name = "lon") val longitue: Float
+        @Json(name = "lat") val latitude: Float,
+        @Json(name = "lon") val longitude: Float
                       )
 
 data class Weather(

@@ -1,6 +1,5 @@
 package example.test.phong.weatherapp.net
 
-import example.test.phong.weatherapp.model.Current
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Headers
