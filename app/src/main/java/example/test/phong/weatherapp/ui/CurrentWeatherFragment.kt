@@ -10,6 +10,7 @@ import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
+import dagger.android.support.AndroidSupportInjection
 import example.test.phong.weatherapp.BuildConfig
 import example.test.phong.weatherapp.Converter
 import example.test.phong.weatherapp.R
@@ -17,6 +18,7 @@ import example.test.phong.weatherapp.location.FusedLocationProvider
 import example.test.phong.weatherapp.location.LocationProvider
 import example.test.phong.weatherapp.model.CurrentWeather
 import example.test.phong.weatherapp.net.Current
+import example.test.phong.weatherapp.net.CurrentWeatherProvider
 import example.test.phong.weatherapp.net.OpenWeatherMapProvider
 import kotlinx.android.synthetic.main.fragment_current_weather.*
 import org.threeten.bp.LocalDateTime
@@ -25,18 +27,25 @@ import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import retrofit2.Call
 import java.util.*
+import javax.inject.Inject
 
 /**
  * A simple [Fragment] subclass.
  *
  */
 class CurrentWeatherFragment : Fragment() {
+    @Inject
+    lateinit var locationProvider: LocationProvider
+    @Inject lateinit var currentWeatherProvider: CurrentWeatherProvider
+
     private lateinit var converter: Converter
-    private lateinit var localtionProvider: LocationProvider
 
     private var call: Call<Current>? = null
-    private val cacheSize: Long = 10 * 1024 * 1024
-    private lateinit var currentWeatherProvider: OpenWeatherMapProvider
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidSupportInjection.inject(this)
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -65,11 +74,8 @@ class CurrentWeatherFragment : Fragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         converter = Converter(context!!)
-        localtionProvider = FusedLocationProvider(context)
-        currentWeatherProvider = OpenWeatherMapProvider(context, BuildConfig.API_KEY)
     }
 
-    @SuppressLint("MissingPermission")
     override fun onResume() {
         super.onResume()
         context?.apply {
@@ -80,13 +86,13 @@ class CurrentWeatherFragment : Fragment() {
                     setDisplayHomeAsUpEnabled(false)
                 }
             }
-            localtionProvider.requestUpdates(::retrieveForecast)
+            locationProvider.requestUpdates(::retrieveForecast)
         }
     }
 
     override fun onPause() {
         call?.cancel()
-        localtionProvider.cancelUpdates(::retrieveForecast)
+        locationProvider.cancelUpdates(::retrieveForecast)
         super.onPause()
     }
 

@@ -1,40 +1,14 @@
 package example.test.phong.weatherapp.net
 
-import android.content.Context
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import example.test.phong.weatherapp.model.CurrentWeather
-import okhttp3.Cache
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 
-private const val cacheSize: Long = 10 * 1024 * 1024
 
 class OpenWeatherMapProvider(
-        context: Context, private val appId: String,
-        okHttpClient: OkHttpClient =
-                OkHttpClient.Builder()
-                        .cache(Cache(context.cacheDir, cacheSize))
-                        .addInterceptor(HttpLoggingInterceptor().apply {
-                            level = HttpLoggingInterceptor.Level.BODY
-                        })
-                        .build(),
-        converterFactory: MoshiConverterFactory =
-                MoshiConverterFactory.create(
-                        Moshi.Builder()
-                                .add(KotlinJsonAdapterFactory())
-                                .build()),
-        retrofit: Retrofit = Retrofit.Builder()
-                .client(okHttpClient)
-                .baseUrl("https://api.openweathermap.org/")
-                .addConverterFactory(converterFactory)
-                .build(),
-        private val service: OpenWeatherMap = retrofit.create(OpenWeatherMap::class.java),
+        private val service: OpenWeatherMap,
+        private val appId: String,
         private val calls: MutableList<Call<Current>> = mutableListOf()
         ): CurrentWeatherProvider {
 
